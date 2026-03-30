@@ -83,17 +83,23 @@ function renderDashboard(data, driver, track, team, year) {
   animateNumber('totalWins', data.driver_total_wins || 0);
   animateNumber('trackWins', data.driver_track_wins || 0);
 
-  // ── Driver Profile ──
+  // ── Driver Profile (year-aware) ──
   const ds = data.driver_stats;
   const driverList = document.getElementById('driverStatsList');
   if (ds) {
+    const timeAdv = data.time_advantage;
+    const timeAdvStr = timeAdv != null
+      ? (timeAdv > 0 ? `<span style="color:var(--accent-green)">+${timeAdv}s faster</span>` : `<span style="color:var(--accent-red)">${Math.abs(timeAdv)}s slower</span>`)
+      : 'N/A';
     driverList.innerHTML = `
       <li><span class="stat-key">Career Span</span><span class="stat-val">${ds.career_span}</span></li>
-      <li><span class="stat-key">Total Wins</span><span class="stat-val">${ds.total_wins}</span></li>
+      <li><span class="stat-key">Wins (all-time)</span><span class="stat-val">${ds.total_wins}</span></li>
+      <li><span class="stat-key">Wins in ${year || 'Year'}</span><span class="stat-val" style="color:var(--accent-gold);font-weight:700">${data.driver_wins_year || 0}</span></li>
+      <li><span class="stat-key">Wins at Track (up to ${year})</span><span class="stat-val" style="color:var(--accent-blue)">${data.driver_track_wins || 0}</span></li>
       <li><span class="stat-key">Racing Style</span><span class="stat-val"><span class="tag red">${ds.racing_style}</span></span></li>
+      <li><span class="stat-key">Vs Field Avg (${year})</span><span class="stat-val">${timeAdvStr}</span></li>
       <li><span class="stat-key">Preferred Region</span><span class="stat-val">${ds.preferred_continent}</span></li>
       <li><span class="stat-key">Teams</span><span class="stat-val">${ds.teams.slice(0,3).join(', ')}${ds.teams.length > 3 ? '…' : ''}</span></li>
-      <li><span class="stat-key">Tracks Won</span><span class="stat-val">${ds.tracks_won.length}</span></li>
     `;
   } else {
     driverList.innerHTML = '<li class="no-data">No data available for this driver</li>';
@@ -310,7 +316,7 @@ function renderRivals(rivals, driverWins) {
   setTimeout(() => animateBars(el), 400);
 }
 
-// ─── Models Comparison ──────────────────────────────────────────────────────
+// ─── Models Comparison (with year-aware 5-factor breakdown) ─────────────────
 function renderModels(data) {
   const row = document.getElementById('modelsRow');
   row.innerHTML = `
@@ -330,11 +336,21 @@ function renderModels(data) {
 
   const details = document.getElementById('predDetailsList');
   details.innerHTML = `
-    <li><span class="stat-key">Track Win Rate</span><span class="stat-val">${data.track_win_rate || 0}%</span></li>
-    <li><span class="stat-key">Team Synergy Rate</span><span class="stat-val">${data.team_synergy_rate || 0}%</span></li>
-    <li><span class="stat-key">Total Track Races (dataset)</span><span class="stat-val">${data.track_total_races || 0}</span></li>
-    <li><span class="stat-key">Driver+Team Wins</span><span class="stat-val">${data.driver_team_wins || 0}</span></li>
-    <li><span class="stat-key">Team Total Wins</span><span class="stat-val">${data.team_total_wins || 0}</span></li>
+    <li style="border-bottom:2px solid rgba(225,6,0,0.15);padding-bottom:12px;margin-bottom:4px">
+      <span class="stat-key" style="color:var(--text-primary);font-weight:600">📊 5-Factor Breakdown (${data.selected_year || ''})</span>
+      <span class="stat-val"></span>
+    </li>
+    <li><span class="stat-key">Driver Momentum (3yr)</span><span class="stat-val" style="color:var(--accent-green)">${data.momentum_score || 0}%</span></li>
+    <li><span class="stat-key">Track Affinity</span><span class="stat-val">${data.track_win_rate || 0}%</span></li>
+    <li><span class="stat-key">Team Strength (${data.selected_year || 'yr'})</span><span class="stat-val" style="color:var(--accent-blue)">${data.team_year_strength || 0}%</span></li>
+    <li><span class="stat-key">Driver-Team Synergy</span><span class="stat-val">${data.team_synergy_rate || 0}%</span></li>
+    <li><span class="stat-key">Year Form (${data.selected_year || 'yr'})</span><span class="stat-val" style="color:var(--accent-gold)">${data.year_form || 0}%</span></li>
+    <li style="border-top:1px solid rgba(255,255,255,0.06);margin-top:4px;padding-top:10px">
+      <span class="stat-key">Driver Wins in ${data.selected_year || 'Year'}</span>
+      <span class="stat-val">${data.driver_wins_year || 0} / ${data.races_in_year || 0} races</span>
+    </li>
+    <li><span class="stat-key">Team Wins in ${data.selected_year || 'Year'}</span><span class="stat-val">${data.team_wins_year || 0}</span></li>
+    <li><span class="stat-key">Recent Form (3yr wins)</span><span class="stat-val">${data.driver_recent_wins || 0}</span></li>
   `;
 }
 
