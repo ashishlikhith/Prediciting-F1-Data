@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F1 Race Predictor — AI-Powered Performance Analysis</title>
+  <meta name="description" content="Analyze F1 driver performance, predict race outcomes, and compare rivals with AI-powered predictive analytics.">
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- Floating Particles -->
+<div class="particles">
+  <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+  <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+</div>
+
+<!-- ─── Hero ─────────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-badge"><span class="dot"></span> Live Predictive Engine</div>
+  <h1>F1 <span class="gradient-text">Race Predictor</span></h1>
+  <p>Select a driver, track &amp; team to unlock AI-powered performance analysis, win probability, and rival comparison.</p>
+</section>
+
+<!-- ─── Selection Panel ──────────────────────────────────────────────────── -->
+<section class="selection-panel" id="selectionPanel">
+  <div class="selection-grid">
+    <div class="form-group">
+      <label for="driverSelect">🏎️ Driver</label>
+      <select id="driverSelect"><option value="">Loading…</option></select>
+    </div>
+    <div class="form-group">
+      <label for="trackSelect">🏁 Grand Prix</label>
+      <select id="trackSelect"><option value="">Loading…</option></select>
+    </div>
+    <div class="form-group">
+      <label for="teamSelect">🔧 Team</label>
+      <select id="teamSelect"><option value="">Loading…</option></select>
+    </div>
+    <div class="form-group">
+      <label for="yearSelect">📅 Year</label>
+      <select id="yearSelect"><option value="">Loading…</option></select>
+    </div>
+  </div>
+  <button class="btn-analyze" id="btnAnalyze" onclick="analyze()">
+    <span class="btn-text">⚡ Analyze Performance</span>
+    <span class="spinner"></span>
+  </button>
+</section>
+
+<!-- ─── Dashboard ────────────────────────────────────────────────────────── -->
+<section class="dashboard" id="dashboard">
+
+  <h2 class="dashboard-title"><span class="flag">🏆</span> <span id="dashTitle">Performance Dashboard</span></h2>
+
+  <!-- Prediction Hero -->
+  <div class="card-grid">
+    <div class="card prediction-hero" id="predictionHero">
+      <!-- Win Probability Gauge -->
+      <div class="prediction-stat">
+        <div class="gauge-container">
+          <svg class="gauge-svg" viewBox="0 0 160 160">
+            <circle class="gauge-bg" cx="80" cy="80" r="70"></circle>
+            <circle class="gauge-fill" id="gaugeFill" cx="80" cy="80" r="70"></circle>
+          </svg>
+          <div class="gauge-value" id="gaugeValue">0%</div>
+        </div>
+        <div class="stat-label">Win Probability</div>
+      </div>
+      <!-- Predicted Position -->
+      <div class="prediction-stat">
+        <div class="big-num gold" id="predPosition">—</div>
+        <div class="stat-label">Predicted Position</div>
+      </div>
+      <!-- Total Wins -->
+      <div class="prediction-stat">
+        <div class="big-num" id="totalWins">—</div>
+        <div class="stat-label">Career Wins</div>
+      </div>
+      <!-- Track Wins -->
+      <div class="prediction-stat">
+        <div class="big-num blue" id="trackWins">—</div>
+        <div class="stat-label">Track Wins</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grid">
+
+    <!-- Driver Profile Card -->
+    <div class="card" id="driverCard">
+      <div class="card-header">
+        <div class="card-icon">🧑‍✈️</div>
+        <div class="card-title">Driver Profile</div>
+      </div>
+      <ul class="stats-list" id="driverStatsList"></ul>
+    </div>
+
+    <!-- Performance Over Years Chart -->
+    <div class="card" id="perfCard">
+      <div class="card-header">
+        <div class="card-icon gold">📈</div>
+        <div class="card-title">Wins Over Years</div>
+      </div>
+      <div class="chart-wrap"><canvas id="perfChart"></canvas></div>
+    </div>
+
+    <!-- Racing Style & Strengths -->
+    <div class="card" id="styleCard">
+      <div class="card-header">
+        <div class="card-icon green">🎯</div>
+        <div class="card-title">Racing Style & Strengths</div>
+      </div>
+      <div id="styleContent"></div>
+    </div>
+
+    <!-- Team / Car Performance -->
+    <div class="card" id="teamCard">
+      <div class="card-header">
+        <div class="card-icon blue">🔧</div>
+        <div class="card-title">Team Performance</div>
+      </div>
+      <ul class="stats-list" id="teamStatsList"></ul>
+      <div class="chart-wrap" style="margin-top:16px"><canvas id="teamChart"></canvas></div>
+    </div>
+
+    <!-- Rival Comparison -->
+    <div class="card" id="rivalCard">
+      <div class="card-header">
+        <div class="card-icon purple">⚔️</div>
+        <div class="card-title">Top Rivals</div>
+      </div>
+      <div id="rivalsContent"></div>
+    </div>
+
+    <!-- Predictive Models Comparison -->
+    <div class="card" id="modelCard">
+      <div class="card-header">
+        <div class="card-icon">🤖</div>
+        <div class="card-title">Predictive Models</div>
+      </div>
+      <div class="models-row" id="modelsRow"></div>
+      <ul class="stats-list" style="margin-top:16px" id="predDetailsList"></ul>
+    </div>
+
+    <!-- Track History -->
+    <div class="card" id="trackHistCard" style="grid-column: 1 / -1;">
+      <div class="card-header">
+        <div class="card-icon gold">🏁</div>
+        <div class="card-title">Driver's Track History</div>
+      </div>
+      <div id="trackHistContent"></div>
+    </div>
+
+  </div>
+</section>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
